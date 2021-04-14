@@ -63,6 +63,7 @@ void AsyncRun(void);
 ## 注意
 - 在多线程环境下使用使用函数AsyncStart，AsyncStop得加互斥锁，防止资源冲突
 - 调用AsyncStart函数即可启动协程，协程函数必须是pt函数
+- AsyncRun函数可放在独立的线程中循环执行
 
 ## 测试用例
 在windows环境下开发测试。共启动4个协程任务：
