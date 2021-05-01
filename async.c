@@ -14,16 +14,20 @@
 
 typedef struct {
     AsyncFunc func;
-    int interval;
+    uint64_t interval;
     int lastResult;
     int count;
     uint64_t timestamp;
+
+    // 等待截至时间
+    uint64_t waitEndTime;
 } tItem;
 
 #pragma pack()
 
 static int gMid = -1;
 static intptr_t gList = 0;
+static tItem* itemNow = NULL;
 
 static TZListNode* getNode(AsyncFunc func);
 static TZListNode* createNode(void);
@@ -38,7 +42,7 @@ void AsyncLoad(int mid) {
 // AsyncStart 启动协程
 // interval是运行间隔.单位:us
 // interval是ASYNC_ONLY_ONE_TIME时是单次运行,是ASYNC_NO_WAIT时无间隔运行
-bool AsyncStart(AsyncFunc func, int interval) {
+bool AsyncStart(AsyncFunc func, uint64_t interval) {
     TZListNode* node = getNode(func);
     if (node == NULL) {
         node = createNode();
@@ -112,8 +116,14 @@ void AsyncRun(void) {
 
 static void checkNode(TZListNode* node, uint64_t now) {
     tItem* item = (tItem*)node->Data;
+    itemNow = item;
     if (item->lastResult != PT_ENDED || item->interval == ASYNC_NO_WAIT) {
+        if (item->waitEndTime != 0 && now < item->waitEndTime) {
+            // 等待中返回
+            return;
+        }
         // 未结束的以及不等待的直接执行
+        item->waitEndTime = 0;
         item->lastResult = item->func();
         item->timestamp = now;
         return;
@@ -135,4 +145,9 @@ static void checkNode(TZListNode* node, uint64_t now) {
         item->lastResult = item->func();
         item->timestamp = now;
     }
+}
+
+// AsyncWait 等待.interval是等待间隔.单位:us
+void AsyncWait(uint64_t interval) {
+    itemNow->waitEndTime = TZTimeGet() + interval;
 }

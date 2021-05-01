@@ -5,6 +5,8 @@
 #ifndef ASYNC_H
 #define ASYNC_H
 
+#include "pt.h"
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -12,18 +14,24 @@
 // 单次运行
 #define ASYNC_ONLY_ONE_TIME 0
 // 无间隔运行
-#define ASYNC_NO_WAIT -1
+#define ASYNC_NO_WAIT ((uint64_t)-1)
 
 // 时间单位
 // 毫秒
-#define ASYNC_MILLISECOND 1000
+#define ASYNC_MILLISECOND 1000ull
 // 秒
-#define ASYNC_SECOND 1000000
+#define ASYNC_SECOND 1000000ull
 // 分
-#define ASYNC_MINUTE 60000000
+#define ASYNC_MINUTE 60000000ull
 // 小时
-#define ASYNC_HOUR 3600000000
+#define ASYNC_HOUR 3600000000ull
 
+// ASYNC_WAIT 等待.interval是等待间隔.单位:us
+#define ASYNC_WAIT(pt, interval)    \
+    do {                            \
+        AsyncWait(interval);        \
+        PT_YIELD(pt);               \
+    } while(0)
 
 // AsyncFunc 协程函数类型.必须是基于pt实现的函数
 typedef int (*AsyncFunc)(void);
@@ -34,12 +42,15 @@ void AsyncLoad(int mid);
 // AsyncStart 启动协程
 // interval是运行间隔.单位:us
 // interval是ASYNC_ONLY_ONE_TIME时是单次运行,是ASYNC_NO_WAIT时无间隔运行
-bool AsyncStart(AsyncFunc func, int interval);
+bool AsyncStart(AsyncFunc func, uint64_t interval);
 
 // AsyncStop 停止协程
 void AsyncStop(AsyncFunc func);
 
 // AsyncRun 协程运行
 void AsyncRun(void);
+
+// AsyncWait 等待.interval是等待间隔.单位:us
+void AsyncWait(uint64_t interval);
 
 #endif

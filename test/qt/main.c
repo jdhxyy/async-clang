@@ -50,7 +50,11 @@ static int task1(void) {
 
     now = getTime();
     ms = (int)(now / 1000);
-    printf("%d task1\n", ms);
+    printf("%d.%d task1\n", ms / 1000, ms % 1000);
+
+    ASYNC_WAIT(&pt, 1 * ASYNC_SECOND);
+    ASYNC_WAIT(&pt, 1 * ASYNC_SECOND);
+    ASYNC_WAIT(&pt, 1 * ASYNC_SECOND);
 
     PT_END(&pt);
 }
@@ -64,7 +68,9 @@ static int task2(void) {
 
     now = getTime();
     ms = (int)(now / 1000);
-    printf("%d task2\n", ms);
+    printf("%d.%d task2\n", ms / 1000, ms % 1000);
+
+    ASYNC_WAIT(&pt, 500 * ASYNC_MILLISECOND);
 
     PT_END(&pt);
 }
@@ -78,7 +84,7 @@ static int task3(void) {
 
     now = getTime();
     ms = (int)(now / 1000);
-    printf("%d task3\n", ms);
+    printf("%d.%d task3\n", ms / 1000, ms % 1000);
 
     PT_END(&pt);
 }
@@ -96,6 +102,6 @@ static int task4(void) {
 
     now = getTime();
     ms = (int)(now / 1000);
-    printf("%d task4\n", ms);
+    printf("%d.%d task4\n", ms / 1000, ms % 1000);
     PT_END(&pt);
 }
