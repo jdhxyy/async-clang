@@ -24,7 +24,6 @@ int main() {
     TZMallocLoad(RAM_INTERNAL, 20, 100 * 1024, malloc(100 * 1024));
     gMid = TZMallocRegister(RAM_INTERNAL, "dcom", 4096);
 
-    AsyncLoad(gMid);
     AsyncStart(task1, 500 * ASYNC_MILLISECOND);
     AsyncStart(task2, 1 * ASYNC_SECOND);
     AsyncStart(task3, ASYNC_ONLY_ONE_TIME);

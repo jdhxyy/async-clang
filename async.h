@@ -10,6 +10,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#define ASYNC_TAG "async"
+#define ASYNC_MALLOC_SIZE 4096
+
 // 运行间隔类型
 // 单次运行
 #define ASYNC_ONLY_ONE_TIME 0
@@ -35,9 +38,6 @@
 
 // AsyncFunc 协程函数类型.必须是基于pt实现的函数
 typedef int (*AsyncFunc)(void);
-
-// AsyncLoad 模块载入.mid是通过tzmalloc申请的内存id
-void AsyncLoad(int mid);
 
 // AsyncStart 启动协程
 // interval是运行间隔.单位:us

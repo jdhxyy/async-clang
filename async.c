@@ -3,10 +3,12 @@
 // Authors: jdh99 <jdh821@163.com>
 
 #include "async.h"
+
 #include "pt.h"
 #include "tzmalloc.h"
 #include "tzlist.h"
 #include "tztime.h"
+#include "lagan.h"
 
 #include <string.h>
 
@@ -25,18 +27,35 @@ typedef struct {
 
 #pragma pack()
 
-static int gMid = -1;
-static intptr_t gList = 0;
 static tItem* itemNow = NULL;
+
+static int getMid(void);
+static intptr_t getList(void);
 
 static TZListNode* getNode(AsyncFunc func);
 static TZListNode* createNode(void);
 static void checkNode(TZListNode* node, uint64_t now);
 
-// AsyncLoad 模块载入.mid是通过tzmalloc申请的内存id
-void AsyncLoad(int mid) {
-    gMid = mid;
-    gList = TZListCreateList(gMid);
+static int getMid(void) {
+    static int mid = -1;
+    if (mid == -1) {
+        mid = TZMallocRegister(0, ASYNC_TAG, ASYNC_MALLOC_SIZE);
+        if (mid == -1) {
+            LE(ASYNC_TAG, "malloc register failed!");
+        }
+    }
+    return mid;
+}
+
+static intptr_t getList(void) {
+    static intptr_t list = 0;
+    if (list == 0) {
+        list = TZListCreateList(getMid());
+        if (list == 0) {
+            LE(ASYNC_TAG, "create list failed!");
+        }
+    }
+    return list;
 }
 
 // AsyncStart 启动协程
@@ -47,9 +66,10 @@ bool AsyncStart(AsyncFunc func, uint64_t interval) {
     if (node == NULL) {
         node = createNode();
         if (node == NULL) {
+            LE(ASYNC_TAG, "async start failed!create node failed!");
             return false;
         }
-        TZListAppend(gList, node);
+        TZListAppend(getList(), node);
     }
 
     tItem* item = (tItem*)node->Data;
@@ -62,7 +82,7 @@ bool AsyncStart(AsyncFunc func, uint64_t interval) {
 }
 
 static TZListNode* getNode(AsyncFunc func) {
-    TZListNode* node = TZListGetHeader(gList);
+    TZListNode* node = TZListGetHeader(getList());
     tItem* item = NULL;
     for (;;) {
         if (node == NULL) {
@@ -78,11 +98,11 @@ static TZListNode* getNode(AsyncFunc func) {
 }
 
 static TZListNode* createNode(void) {
-    TZListNode* node = TZListCreateNode(gList);
+    TZListNode* node = TZListCreateNode(getList());
     if (node == NULL) {
         return NULL;
     }
-    node->Data = TZMalloc(gMid, sizeof(tItem));
+    node->Data = TZMalloc(getMid(), sizeof(tItem));
     if (node->Data == NULL) {
         TZFree(node);
         return NULL;
@@ -96,13 +116,13 @@ void AsyncStop(AsyncFunc func) {
     if (node == NULL) {
         return;
     }
-    TZListRemove(gList, node);
+    TZListRemove(getList(), node);
 }
 
 // AsyncRun 协程运行
 void AsyncRun(void) {
     uint64_t now = TZTimeGet();
-    TZListNode* node = TZListGetHeader(gList);
+    TZListNode* node = TZListGetHeader(getList());
     TZListNode* nodeNext = NULL;
     for (;;) {
         if (node == NULL) {
@@ -135,7 +155,7 @@ static void checkNode(TZListNode* node, uint64_t now) {
             item->lastResult = item->func();
             item->count++;
         } else {
-            TZListRemove(gList, node);
+            TZListRemove(getList(), node);
         }
         return;
     }
