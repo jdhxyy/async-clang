@@ -30,6 +30,7 @@
 #define ASYNC_HOUR 3600000000ull
 
 // ASYNC_WAIT 等待.interval是等待间隔.单位:us
+// 注意:只有通过AsyncStart启动的任务才可调用本函数
 #define ASYNC_WAIT(pt, interval)    \
     do {                            \
         AsyncWait(interval);        \
