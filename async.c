@@ -137,7 +137,8 @@ void AsyncRun(void) {
 static void checkNode(TZListNode* node, uint64_t now) {
     tItem* item = (tItem*)node->Data;
     itemNow = item;
-    if (item->lastResult != PT_ENDED || item->interval == ASYNC_NO_WAIT) {
+    if (item->lastResult == PT_WAITING || item->lastResult == PT_YIELDED || 
+        item->interval == ASYNC_NO_WAIT) {
         if (item->waitEndTime != 0 && now < item->waitEndTime) {
             // µÈ´ýÖÐ·µ»Ø
             return;
