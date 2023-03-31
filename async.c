@@ -1,5 +1,5 @@
 // Copyright 2021-2021 The jdh99 Authors. All rights reserved.
-// »ùÓÚptÊµÏÖµÄĞ­³Ì¿ò¼Ü
+// åŸºäºptå®ç°çš„åç¨‹æ¡†æ¶
 // Authors: jdh99 <jdh821@163.com>
 
 #include "async.h"
@@ -21,7 +21,7 @@ typedef struct {
     int count;
     uint64_t timestamp;
 
-    // µÈ´ı½ØÖÁÊ±¼ä
+    // ç­‰å¾…æˆªè‡³æ—¶é—´
     uint64_t waitEndTime;
 } tItem;
 
@@ -58,9 +58,9 @@ static intptr_t getList(void) {
     return list;
 }
 
-// AsyncStart Æô¶¯Ğ­³Ì
-// intervalÊÇÔËĞĞ¼ä¸ô.µ¥Î»:us
-// intervalÊÇASYNC_ONLY_ONE_TIMEÊ±ÊÇµ¥´ÎÔËĞĞ,ÊÇASYNC_NO_WAITÊ±ÎŞ¼ä¸ôÔËĞĞ
+// AsyncStart å¯åŠ¨åç¨‹
+// intervalæ˜¯è¿è¡Œé—´éš”.å•ä½:us
+// intervalæ˜¯ASYNC_ONLY_ONE_TIMEæ—¶æ˜¯å•æ¬¡è¿è¡Œ,æ˜¯ASYNC_NO_WAITæ—¶æ— é—´éš”è¿è¡Œ
 bool AsyncStart(AsyncFunc func, uint64_t interval) {
     TZListNode* node = getNode(func);
     if (node == NULL) {
@@ -110,7 +110,7 @@ static TZListNode* createNode(void) {
     return node;
 }
 
-// AsyncStop Í£Ö¹Ğ­³Ì
+// AsyncStop åœæ­¢åç¨‹
 void AsyncStop(AsyncFunc func) {
     TZListNode* node = getNode(func);
     if (node == NULL) {
@@ -119,7 +119,7 @@ void AsyncStop(AsyncFunc func) {
     TZListRemove(getList(), node);
 }
 
-// AsyncRun Ğ­³ÌÔËĞĞ
+// AsyncRun åç¨‹è¿è¡Œ
 void AsyncRun(void) {
     uint64_t now = TZTimeGet();
     TZListNode* node = TZListGetHeader(getList());
@@ -140,10 +140,10 @@ static void checkNode(TZListNode* node, uint64_t now) {
     if (item->lastResult == PT_WAITING || item->lastResult == PT_YIELDED || 
         item->interval == ASYNC_NO_WAIT) {
         if (item->waitEndTime != 0 && now < item->waitEndTime) {
-            // µÈ´ıÖĞ·µ»Ø
+            // ç­‰å¾…ä¸­è¿”å›
             return;
         }
-        // Î´½áÊøµÄÒÔ¼°²»µÈ´ıµÄÖ±½ÓÖ´ĞĞ
+        // æœªç»“æŸçš„ä»¥åŠä¸ç­‰å¾…çš„ç›´æ¥æ‰§è¡Œ
         item->waitEndTime = 0;
         item->lastResult = item->func();
         item->timestamp = now;
@@ -151,7 +151,7 @@ static void checkNode(TZListNode* node, uint64_t now) {
     }
 
     if (item->interval == ASYNC_ONLY_ONE_TIME) {
-        // µ¥´ÎÔËĞĞ
+        // å•æ¬¡è¿è¡Œ
         if (item->count == 0) {
             item->lastResult = item->func();
             item->count++;
@@ -161,14 +161,14 @@ static void checkNode(TZListNode* node, uint64_t now) {
         return;
     }
 
-    // ²é¿´¼ä¸ôÊÇ·ñµ½
+    // æŸ¥çœ‹é—´éš”æ˜¯å¦åˆ°
     if (now - item->timestamp >= (uint64_t)item->interval) {
         item->lastResult = item->func();
         item->timestamp = now;
     }
 }
 
-// AsyncWait µÈ´ı.intervalÊÇµÈ´ı¼ä¸ô.µ¥Î»:us
+// AsyncWait ç­‰å¾….intervalæ˜¯ç­‰å¾…é—´éš”.å•ä½:us
 void AsyncWait(uint64_t interval) {
     itemNow->waitEndTime = TZTimeGet() + interval;
 }

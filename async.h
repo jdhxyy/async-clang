@@ -1,5 +1,5 @@
 // Copyright 2021-2021 The jdh99 Authors. All rights reserved.
-// »ùÓÚptÊµÏÖµÄĞ­³Ì¿ò¼Ü
+// åŸºäºptå®ç°çš„åç¨‹æ¡†æ¶
 // Authors: jdh99 <jdh821@163.com>
 
 #ifndef ASYNC_H
@@ -13,45 +13,45 @@
 #define ASYNC_TAG "async"
 #define ASYNC_MALLOC_SIZE 4096
 
-// ÔËĞĞ¼ä¸ôÀàĞÍ
-// µ¥´ÎÔËĞĞ
+// è¿è¡Œé—´éš”ç±»å‹
+// å•æ¬¡è¿è¡Œ
 #define ASYNC_ONLY_ONE_TIME 0
-// ÎŞ¼ä¸ôÔËĞĞ
+// æ— é—´éš”è¿è¡Œ
 #define ASYNC_NO_WAIT ((uint64_t)-1)
 
-// Ê±¼äµ¥Î»
-// ºÁÃë
+// æ—¶é—´å•ä½
+// æ¯«ç§’
 #define ASYNC_MILLISECOND 1000ull
-// Ãë
+// ç§’
 #define ASYNC_SECOND 1000000ull
-// ·Ö
+// åˆ†
 #define ASYNC_MINUTE 60000000ull
-// Ğ¡Ê±
+// å°æ—¶
 #define ASYNC_HOUR 3600000000ull
 
-// ASYNC_WAIT µÈ´ı.intervalÊÇµÈ´ı¼ä¸ô.µ¥Î»:us
-// ×¢Òâ:Ö»ÓĞÍ¨¹ıAsyncStartÆô¶¯µÄÈÎÎñ²Å¿Éµ÷ÓÃ±¾º¯Êı
+// ASYNC_WAIT ç­‰å¾….intervalæ˜¯ç­‰å¾…é—´éš”.å•ä½:us
+// æ³¨æ„:åªæœ‰é€šè¿‡AsyncStartå¯åŠ¨çš„ä»»åŠ¡æ‰å¯è°ƒç”¨æœ¬å‡½æ•°
 #define ASYNC_WAIT(pt, interval)    \
     do {                            \
         AsyncWait(interval);        \
         PT_YIELD(pt);               \
     } while(0)
 
-// AsyncFunc Ğ­³Ìº¯ÊıÀàĞÍ.±ØĞëÊÇ»ùÓÚptÊµÏÖµÄº¯Êı
+// AsyncFunc åç¨‹å‡½æ•°ç±»å‹.å¿…é¡»æ˜¯åŸºäºptå®ç°çš„å‡½æ•°
 typedef int (*AsyncFunc)(void);
 
-// AsyncStart Æô¶¯Ğ­³Ì
-// intervalÊÇÔËĞĞ¼ä¸ô.µ¥Î»:us
-// intervalÊÇASYNC_ONLY_ONE_TIMEÊ±ÊÇµ¥´ÎÔËĞĞ,ÊÇASYNC_NO_WAITÊ±ÎŞ¼ä¸ôÔËĞĞ
+// AsyncStart å¯åŠ¨åç¨‹
+// intervalæ˜¯è¿è¡Œé—´éš”.å•ä½:us
+// intervalæ˜¯ASYNC_ONLY_ONE_TIMEæ—¶æ˜¯å•æ¬¡è¿è¡Œ,æ˜¯ASYNC_NO_WAITæ—¶æ— é—´éš”è¿è¡Œ
 bool AsyncStart(AsyncFunc func, uint64_t interval);
 
-// AsyncStop Í£Ö¹Ğ­³Ì
+// AsyncStop åœæ­¢åç¨‹
 void AsyncStop(AsyncFunc func);
 
-// AsyncRun Ğ­³ÌÔËĞĞ
+// AsyncRun åç¨‹è¿è¡Œ
 void AsyncRun(void);
 
-// AsyncWait µÈ´ı.intervalÊÇµÈ´ı¼ä¸ô.µ¥Î»:us
+// AsyncWait ç­‰å¾….intervalæ˜¯ç­‰å¾…é—´éš”.å•ä½:us
 void AsyncWait(uint64_t interval);
 
 #endif
